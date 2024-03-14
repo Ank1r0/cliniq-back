@@ -5,6 +5,7 @@ import com.example.cliniqserv.DTO.UserDTO;
 import com.example.cliniqserv.DTO.mapper.AppoUserMapper;
 import com.example.cliniqserv.entity.Appointment;
 import com.example.cliniqserv.repo.AppoRepo;
+import com.example.cliniqserv.repo.UserRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -28,6 +29,8 @@ public class AppoController {
 
     @Autowired
     private AppoRepo appoRepo;
+
+    private UserRepo userRepo;
 
 
 
@@ -122,5 +125,14 @@ public class AppoController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @DeleteMapping(path = "deleteAppoBy/{id}")
+    public ResponseEntity<HttpStatus> deleteAppoById(@PathVariable Long id){
+
+        appoRepo.deleteById(id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+
 
 }
