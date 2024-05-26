@@ -1,7 +1,6 @@
 package com.example.cliniqserv.controller;
 
 import com.example.cliniqserv.DTO.AppointmentDTO;
-import com.example.cliniqserv.DTO.UserDTO;
 import com.example.cliniqserv.DTO.mapper.AppoUserMapper;
 import com.example.cliniqserv.entity.Appointment;
 import com.example.cliniqserv.repo.AppoRepo;
@@ -17,22 +16,18 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-// create UserDTO and AppointmentDTO and use them in controllers
 @RestController
-@RequestMapping("/Appointment")
+@RequestMapping("/api/appointment")
 @RequiredArgsConstructor
 @CrossOrigin
 public class AppoController {
 
     private final AppoUserMapper appoUserMapper;
 
-
     @Autowired
     private AppoRepo appoRepo;
 
     private UserRepo userRepo;
-
-
 
     @PostMapping("/saveAppo")
     public ResponseEntity<String> saveAppointments(@RequestBody List<Appointment> appoData)
@@ -43,16 +38,13 @@ public class AppoController {
 
     @PostMapping(path = "/addAppo")
     public ResponseEntity<Appointment> addAppo(@RequestBody Appointment appointment){
-
-        System.out.println("addAppo");
-
-
+        System.out.println("addAppo: " + appointment);
         Appointment appoObj = appoRepo.save(appointment);
 
         return new ResponseEntity<>(appoObj,HttpStatus.OK);
     }
 
-    @PostMapping("/updateAppoById/{id}")
+    @PatchMapping("/updateAppoById/{id}")
     public ResponseEntity<AppointmentDTO> updateAppoByID(@PathVariable Long id, @RequestBody Appointment newAppoData){
 
         Optional<Appointment> oldAppoData = appoRepo.findById(id);
@@ -63,14 +55,6 @@ public class AppoController {
                 if(newAppoData.getVideoCallCode() != null)
                 {
                     updatedAppoData.setVideoCallCode(newAppoData.getVideoCallCode());
-                }
-                if(newAppoData.getPatientSet() != null)
-                {
-                    updatedAppoData.setPatientSet(newAppoData.getPatientSet());
-                }
-                if(newAppoData.getDoctorSet() != null)
-                {
-                    updatedAppoData.setDoctorSet(newAppoData.getDoctorSet());
                 }
                 if(newAppoData.getMedicalRecord() != null)
                 {
@@ -90,27 +74,25 @@ public class AppoController {
     }
 
     @GetMapping(path = "/getAppointmentById/{id}")
-    public ResponseEntity<AppointmentDTO> getUserByID(@PathVariable Long id){
+    public ResponseEntity<Appointment> getUserByID(@PathVariable Long id){
 
         Optional<Appointment> appoData = appoRepo.findById(id);
 
         if(appoData.isPresent())
         {
-            AppointmentDTO appointmentDTO = appoUserMapper.convertToDto(appoData.get());
-            return new ResponseEntity<>(appointmentDTO,HttpStatus.OK);
+            Appointment appointment = appoData.get();
+            return new ResponseEntity<>(appointment,HttpStatus.OK);
         }
         return  new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
     }
 
 
-    @GetMapping(path = "getAllAppointments")
+    @GetMapping(path = "/getAllAppointments")
     public ResponseEntity<List<AppointmentDTO>> getAllAppointments(){
         try{
             List<Appointment> appoList = new ArrayList<>();
-            System.out.println("List Created");
             appoRepo.findAll().forEach(appoList::add);
-            System.out.println("List size"+appoList.size());
 
             List<AppointmentDTO> res = appoList.stream().map(appoUserMapper::convertToDto).collect(Collectors.toList());
 
@@ -132,7 +114,6 @@ public class AppoController {
         appoRepo.deleteById(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
-
 
 
 }

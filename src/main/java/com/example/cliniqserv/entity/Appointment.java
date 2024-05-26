@@ -1,36 +1,33 @@
 package com.example.cliniqserv.entity;
 
+import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
 import jakarta.transaction.Transactional;
 import lombok.*;
-
-import java.util.HashSet;
-import java.util.Set;
-
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Transactional
 @Data
 @NoArgsConstructor
 @Table(name = "Appointment")
+
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class , property = "id",    scope=Appointment.class
+)
 public class Appointment {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 
     private String videoCallCode;
 
-    @ManyToMany(mappedBy = "appointmentsP",fetch = FetchType.LAZY)
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    private Set<User> patientSet;
-
-    @ManyToMany(mappedBy = "appointmentsD",fetch = FetchType.LAZY)
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    private Set<User> doctorSet;
+     @JsonIdentityReference(alwaysAsId = true) // show only id of User
+//    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+    @ManyToMany(cascade = CascadeType.ALL, mappedBy = "assignedAppointments",fetch = FetchType.LAZY)
+    private List<User> assignedUsers = new ArrayList<User>();
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "medicalRecord_id", referencedColumnName = "id")
@@ -44,14 +41,6 @@ public class Appointment {
         this.videoCallCode = videoCallCode;
     }
 
-    public void addPatient(User patient) {
-        patientSet.add(patient);
-    }
-
-    public void addDoctor(User doctor) {
-        doctorSet.add(doctor);
-    }
-
     public void setMedicalRecord(MedicalRecord medicalRecord) {
         this.medicalRecord = medicalRecord;
     }
@@ -61,9 +50,7 @@ public class Appointment {
         return "Appointment{" +
                 "id=" + id +
                 ", videoCallCode='" + videoCallCode + '\'' +
-                ", patientSet=" + patientSet +
-                ", doctorSet=" + doctorSet +
-                ", medicalRecord=" + medicalRecord +
+//                ", medicalRecord=" + medicalRecord.toString() +
                 '}';
     }
 }

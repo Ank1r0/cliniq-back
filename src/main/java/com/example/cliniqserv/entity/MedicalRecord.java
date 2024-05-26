@@ -5,8 +5,6 @@ import jakarta.transaction.Transactional;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.swing.*;
-
 @Entity
 @Transactional
 @Data
@@ -14,7 +12,9 @@ import javax.swing.*;
 @Table(name = "MedicalRecord")
 public class MedicalRecord {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+
     private Long id;
 
     private String aboutAppo;
@@ -22,4 +22,12 @@ public class MedicalRecord {
     @OneToOne(mappedBy = "medicalRecord")
     private Appointment appointment;
 
+    @Override
+    public String toString() {
+        return "Appointment{" +
+                "id=" + id +
+                ", aboutAppo='" + aboutAppo + '\'' +
+//                ", appointment=" + appointment +
+                '}';
+    }
 }

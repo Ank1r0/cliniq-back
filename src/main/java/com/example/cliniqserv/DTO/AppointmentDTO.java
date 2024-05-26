@@ -1,5 +1,6 @@
 package com.example.cliniqserv.DTO;
 
+import com.example.cliniqserv.entity.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -9,6 +10,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -26,6 +28,5 @@ public class AppointmentDTO {
     //were added
     private MedicalRecordDTO medicalRecord;
 
-    private Set<UserDTO> userDTOdoctorSet;
-
+    private List<User> assignedUsers;
 }

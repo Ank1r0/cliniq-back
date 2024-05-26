@@ -1,6 +1,6 @@
 package com.example.cliniqserv.repo;
 
-
+import com.example.cliniqserv.DTO.UserNoPassDTO;
 import com.example.cliniqserv.entity.User;
 import com.example.cliniqserv.extra.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,6 +13,5 @@ import java.util.Optional;
 public interface UserRepo extends JpaRepository<User, Long> {
     Optional<User> findByLogin(String login);
 
-    User findByRole(Role role);
-
+    List<User> findByRole(Role role);
 }

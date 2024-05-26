@@ -1,25 +1,28 @@
 package com.example.cliniqserv.DTO;
 
-import jakarta.persistence.*;
-import jdk.jfr.Name;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import java.util.Date;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class MedicalRecordDTO {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+public class UserNoPassDTO{
 
     private Long id;
 
-    private String aboutAppo;
+    private String Name;
 
+    private String Surname;
+
+    private String Login;
+
+    private Date dob;
+
+    private String specialisation;
+
+    private String role;
 }
-

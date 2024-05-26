@@ -1,16 +1,13 @@
 package com.example.cliniqserv.DTO;
 
-import com.example.cliniqserv.extra.Role;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
+import com.example.cliniqserv.entity.Appointment;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Data;
 
 import java.util.Date;
-
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -34,5 +31,5 @@ public class UserDTO {
 
     private String role;
 
-
+    private List<Appointment> assignedAppointments;
 }

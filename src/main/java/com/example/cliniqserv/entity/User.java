@@ -1,13 +1,9 @@
 package com.example.cliniqserv.entity;
 
 import com.example.cliniqserv.extra.Role;
-import com.example.cliniqserv.extra.tools;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,9 +15,12 @@ import java.util.*;
 @Table(name = "user")
 @NoArgsConstructor
 @AllArgsConstructor
+
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+
     private Long id;
 
     private String login;
@@ -40,23 +39,26 @@ public class User implements UserDetails {
     private String specialisation;
 
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinTable(name = "Appo_patient",joinColumns = {
-            @JoinColumn(name = "User_id",referencedColumnName = "id")
-    },
-    inverseJoinColumns = {
-            @JoinColumn(name = "Appointment_id",referencedColumnName = "id")
-    })
-    private Set<Appointment> appointmentsP;
+    @OneToMany
+//  (mappedBy="notice_id", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "notice_id", referencedColumnName = "id")
+    private List<Notice> calendarList;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinTable(name = "Appo_doctor",joinColumns = {
-            @JoinColumn(name = "User_id",referencedColumnName = "id")
-    },
-            inverseJoinColumns = {
-                    @JoinColumn(name = "Appointment_id",referencedColumnName = "id")
-            })
-    private Set<Appointment> appointmentsD;
+//  @JsonIgnore
+//    @Getter
+//    @Transient
+//    private HashMap<String, String> calendarList = new HashMap<String, String>();
+//    private Set<String> calendarList = new Set<String>();
+
+    @JsonIdentityReference(alwaysAsId = true) // show only id of Appointment
+    @JsonProperty("assignedAppointments")
+
+    @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.ALL }, targetEntity = Appointment.class)
+    @JoinTable(name = "appo_user", joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "appointment_id"))
+    @Setter
+    @Getter
+    private List<Appointment> assignedAppointments = new ArrayList<Appointment>();
 
     public void setLogin(String login) {
         this.login = login;
@@ -78,47 +80,23 @@ public class User implements UserDetails {
         this.dob = dob;
     }
 
-    public void setRole(Role role) throws Exception {
-        this.role = role;
-    }
+    public void setRole(Role role) throws Exception { this.role = role; }
 
     public void setSpecialisation(String specialisation) {
         this.specialisation = specialisation;
     }
 
-    public void setAppointmentsP(Set<Appointment> appointmentsP) {
-        this.appointmentsP = appointmentsP;
-    }
-
-    public void setAppointmentsD(Set<Appointment> appointmentsD) {
-        this.appointmentsD = appointmentsD;
-    }
-
-    public void addAppointmentsP(Appointment appointmentP) {
-        appointmentsP.add(appointmentP);
-    }
-
-    public void addAppointmentsD(Appointment appointmentD) {
-        appointmentsD.add(appointmentD);
-    }
-
-
     public void setId(Long id) {
         this.id = id;
     }
 
-    @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", Login='" + login + '\'' +
-                ", Password='" + Password + '\'' +
-                ", Name='" + Name + '\'' +
-                ", Surname='" + Surname + '\'' +
-                ", dob=" + dob +
-                ", role=" + role +
-                ", specialisation='" + specialisation + '\'' +
-                '}';
+    public void addNotice(String day, String visit) {
+        {
+            Notice newNotice = new Notice(day, visit, this);
+            this.calendarList.add(newNotice);
+            System.out.println("this.calendarList: " + this.calendarList);
+//            this.calendarList.put(day, visit);
+        }
     }
 
     @Override
@@ -149,5 +127,20 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", Login='" + login + '\'' +
+                ", Password='" + Password + '\'' +
+                ", Name='" + Name + '\'' +
+                ", Surname='" + Surname + '\'' +
+                ", dob=" + dob +
+                ", role=" + role +
+                ", specialisation='" + specialisation + '\'' +
+//                ", assignedAppointments='" + assignedAppointments + '\'' +
+                '}';
     }
 }
