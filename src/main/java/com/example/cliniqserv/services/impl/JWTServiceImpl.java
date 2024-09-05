@@ -26,15 +26,10 @@ public class JWTServiceImpl implements JWTService {
 
     public String generateToken(UserDetails userDetails)
     {
-        String tmp = Jwts.builder().setSubject(userDetails.getUsername())
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() +10000 * 60 * 24 )) // 4 hours
-                .signWith(getSiginKey(), SignatureAlgorithm.HS256)
-                .compact();
-        System.out.println(new Date(System.currentTimeMillis()));
+
         return Jwts.builder().setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() +10000 * 60 * 24 )) // 4 hours
+                .setExpiration(new Date(System.currentTimeMillis() +10000 * 60 * 24 ))
                 .signWith(getSiginKey(), SignatureAlgorithm.HS256)
                 .compact();
     }

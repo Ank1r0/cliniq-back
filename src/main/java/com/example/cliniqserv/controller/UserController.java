@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import java.util.*;
@@ -132,7 +133,7 @@ public class UserController {
 
     @PostMapping(path = "/addUser")
     public ResponseEntity<User> addUser(@RequestBody User user){
-
+        user.setPassword(new BCryptPasswordEncoder().encode(user.getPassword()));
         User userObj = userRepo.save(user);
 
         return new ResponseEntity<>(userObj,HttpStatus.OK);
@@ -207,19 +208,10 @@ public class UserController {
             try {
 
                 User updatedUserData = userData.get();
-                updatedUserData.addNotice(newNoticeData.getDate(), newNoticeData.getVisit());
+                updatedUserData.addNotice(newNoticeData.getDate(), newNoticeData.getVisit(), newNoticeData.getAppointmentId());
+                User userObj =  userRepo.save(updatedUserData);
 
-                noticeRepo.save(newNoticeData);
-
-                System.out.println("after add notice");
-
-                User userObj = userRepo.save(updatedUserData);
-
-                System.out.println("after user reposave");
-
-
-                System.out.println("userObj" + userObj.getCalendarList());
-                System.out.println("updatedUserData: " + updatedUserData);
+                System.out.println("after add notice and save");
 
                 return new ResponseEntity<>(userObj,HttpStatus.OK);
             }
@@ -232,10 +224,36 @@ public class UserController {
         return  new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
+    @PatchMapping("/updateUserById/{id}/removeNotice/{noticeId}")
+    public ResponseEntity<User> removeNotice(@PathVariable Long id, @PathVariable Long noticeId){
+        Optional<User> userData = userRepo.findById(id);
+
+        if(userData.isPresent()) {
+            try {
+                User updatedUserData = userData.get();
+                System.out.println("updatedUserData" + updatedUserData);
+                updatedUserData.removeNotice(noticeId);
+                System.out.println("removeNotice");
+
+                User userObj = userRepo.save(updatedUserData);
+
+                System.out.println("after remove notice and save");
+
+                return new ResponseEntity<>(userObj,HttpStatus.OK);
+            }
+            catch (Exception ignored)
+            {
+                System.out.println("USER DATA ERROR");
+            }
+        }
+
+        return  new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
     @PatchMapping("/updateUserWithAppoById/{userId}/appo/{appoId}")
-    public ResponseEntity assignAppoToUser(@PathVariable Long userId, @PathVariable Long appoId){
+    public ResponseEntity assignAppoToUser(@PathVariable Long userId, @PathVariable Long appoId, @RequestBody User newUserData){
         Optional<User> userData = userRepo.findById(userId);
         Optional<Appointment> appointmentData = appoRepo.findById(appoId);
+        System.out.println("newUserData: " + newUserData);
 
         User updatedUserData = userData.isPresent() && appointmentData.isPresent() ? userData.get() : null;
 
@@ -262,7 +280,13 @@ public class UserController {
             appointmentSet.add(updatedAppointmentData);
             updatedUserData.setAssignedAppointments(appointmentSet);
 
+            int length = (int) newUserData.getCalendarList().stream().count();
+            if (length > 0) {
+                updatedUserData.addNotice(newUserData.getCalendarList().get(length - 1).getDate(), newUserData.getCalendarList().get(length - 1).getVisit(), newUserData.getCalendarList().get(length - 1).getAppointmentId());
+            }
+
             userRepo.save(updatedUserData);
+
             return new ResponseEntity<>(updatedUserData, HttpStatus.OK);
 
         } catch (Exception ignored)
@@ -315,6 +339,9 @@ public class UserController {
 
     @PatchMapping("/updateUserWithAppoById/{userId}/addAppo")
     public User assignAppoToUser(@PathVariable Long userId, @RequestBody Appointment newAppointmentData){
+
+        System.out.println("newAppointmentData " + newAppointmentData);
+
         Optional<User> userData = userRepo.findById(userId);
         Appointment appoObj = appoRepo.save(newAppointmentData);
 
@@ -350,6 +377,9 @@ public class UserController {
                 User updatedUserData = userData.get();
                 List<Appointment> appointmentSet = updatedUserData.getAssignedAppointments();
                 appointmentSet.removeIf(p -> Objects.equals(p.getId(), appoId));
+
+                updatedUserData.removeNoticeByAppoId(appoId);
+
 
                 System.out.println(appointmentSet);
 

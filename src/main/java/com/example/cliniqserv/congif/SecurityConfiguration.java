@@ -56,6 +56,7 @@ public class SecurityConfiguration {
 //                          .requestMatchers("/api/admin").hasAuthority(Role.Admin.name())
                             .requestMatchers("/api/admin").hasAuthority(Role.Admin.name())
                             .requestMatchers("/api/user/updateUserById/").hasAuthority(Role.Admin.name())
+                            .requestMatchers("/api/user/updateUserById/").hasAuthority(Role.Patient.name())
                             .requestMatchers("/api/user/updateUserWithAppoById/").hasAuthority(Role.Admin.name())
                             //deleteUserById/{id}
                             .requestMatchers("/api/deleteUserById/").hasAuthority(Role.Admin.name())

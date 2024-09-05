@@ -9,6 +9,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Data
 @Entity
@@ -38,11 +39,9 @@ public class User implements UserDetails {
 
     private String specialisation;
 
-
-    @OneToMany
-//  (mappedBy="notice_id", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "notice_id", referencedColumnName = "id")
-    private List<Notice> calendarList;
+    @OneToMany(mappedBy="user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Setter
+    private List<Notice> calendarList = new ArrayList<>();
 
 //  @JsonIgnore
 //    @Getter
@@ -90,15 +89,27 @@ public class User implements UserDetails {
         this.id = id;
     }
 
-    public void addNotice(String day, String visit) {
+    public void addNotice(String day, String visit, Long appointmentId) {
+
         {
-            Notice newNotice = new Notice(day, visit, this);
+            System.out.println("day: " + day);
+            System.out.println("visit: " + visit);
+            Notice newNotice = new Notice(day, visit, appointmentId, this);
             this.calendarList.add(newNotice);
-            System.out.println("this.calendarList: " + this.calendarList);
-//            this.calendarList.put(day, visit);
+       }
+    }
+
+    public void removeNotice(Long id) {
+        {
+            this.calendarList.removeIf(x -> Objects.equals(x.getId(), id));
         }
     }
 
+    public void removeNoticeByAppoId(Long appoId) {
+        {
+            this.calendarList.removeIf(x -> Objects.equals(x.getAppointmentId(), appoId));
+        }
+    }
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.name()));
@@ -140,7 +151,12 @@ public class User implements UserDetails {
                 ", dob=" + dob +
                 ", role=" + role +
                 ", specialisation='" + specialisation + '\'' +
+                ", calendarList='" + calendarList.toString() + '\'' +
+
+//                ", calendarList='" + calendarList.stream().forEach(s -> System.out.println(s)) + '\'' +
 //                ", assignedAppointments='" + assignedAppointments + '\'' +
                 '}';
     }
+
+
 }

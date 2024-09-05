@@ -1,10 +1,12 @@
 package com.example.cliniqserv.DTO;
 
+import com.example.cliniqserv.entity.Notice;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.util.Date;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -25,4 +27,6 @@ public class UserNoPassDTO{
     private String specialisation;
 
     private String role;
+
+    private List<Notice> calendarList;
 }

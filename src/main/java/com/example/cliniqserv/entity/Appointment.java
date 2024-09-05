@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import jakarta.transaction.Transactional;
 import lombok.*;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -23,6 +24,10 @@ public class Appointment {
     private Long id;
 
     private String videoCallCode;
+
+    @Setter
+    @Getter
+    private Date createdDate;
 
      @JsonIdentityReference(alwaysAsId = true) // show only id of User
 //    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
@@ -50,6 +55,7 @@ public class Appointment {
         return "Appointment{" +
                 "id=" + id +
                 ", videoCallCode='" + videoCallCode + '\'' +
+                ", createdDate='" + createdDate + '\'' +
 //                ", medicalRecord=" + medicalRecord.toString() +
                 '}';
     }
