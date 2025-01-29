@@ -43,11 +43,7 @@ public class User implements UserDetails {
     @Setter
     private List<Notice> calendarList = new ArrayList<>();
 
-//  @JsonIgnore
-//    @Getter
-//    @Transient
-//    private HashMap<String, String> calendarList = new HashMap<String, String>();
-//    private Set<String> calendarList = new Set<String>();
+
 
     @JsonIdentityReference(alwaysAsId = true) // show only id of Appointment
     @JsonProperty("assignedAppointments")
